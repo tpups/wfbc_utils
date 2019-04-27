@@ -13,8 +13,8 @@ cookies = {
 }
 
 login = {
-    "username": "Josh784",
-    "password": "***REMOVED***",
+    "username": "USERNAME",
+    "password": "PASSWORD",
     "landingPage": "/mlbcommish19/index2.htm"
 }
 
