@@ -1,0 +1,10 @@
+*************
+Windows setup:
+*************
+py -m venv env
+env\Scripts\activate
+
+if denied:
+Get-ExecutionPolicy
+set-executionpolicy remotesigned
+*************
