@@ -1,8 +1,19 @@
 import json
 import requests
+import datetime
 
-wfbc_url_base = 'https://www.rotowire.com/mlbcommish20/tables/standings-by-date.php?leagueID=163&divisionID=0&start=2020-07-23&end=2020-08-02'
+datetime_obj = datetime.datetime.now()
+year = str(datetime_obj.year)
+month = str(datetime_obj.month)
+if len(month) is 1:
+    month = "0" + month
+day = str(datetime_obj.day - 1)
+if len(day) is 1:
+    day = "0" + day
+end_date = year + "-" + month + "-" + day
 
+wfbc_url_base = 'https://www.rotowire.com/mlbcommish20/tables/standings-by-date.php?leagueID=163&divisionID=0&start=2020-07-23&end=' + end_date
+print(wfbc_url_base)
 headers = {
     'Host': 'www.rotowire.com',
     'Connection': 'keep-alive',

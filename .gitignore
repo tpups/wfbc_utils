@@ -102,3 +102,17 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+pip-selfcheck.json
+pyvenv.cfg
+.vscode/settings.json
+bin/activate
+bin/activate.csh
+bin/activate.fish
+bin/chardetect
+bin/easy_install
+bin/easy_install-3.6
+bin/pip
+bin/pip3
+bin/pip3.6
+bin/python
+bin/python3
