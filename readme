@@ -8,3 +8,16 @@ if denied:
 Get-ExecutionPolicy
 set-executionpolicy remotesigned
 *************
+
+*************
+Starting Mongo (OSX):
+*************
+from project dir:
+mongod --dbpath data/db
+^ deprecated?
+
+installed brew tap
+now:
+
+brew services start mongodb-community
+mongo
