@@ -2,12 +2,12 @@ import json
 import requests
 import datetime
 import pymongo
-import get_standings
+import GetStandings
 
 wfbcLiveStats = "https://www.rotowire.com/mlbcommish20/tables/standings-live.php?leagueID=163&type=S&divisionID=0"
 wfbcLiveRanks = "https://www.rotowire.com/mlbcommish20/tables/standings-live.php?leagueID=163&type=R&divisionID=0"
 
-standings = get_standings.getStandings(wfbcLiveStats)
+standings = GetStandings.getStandings(wfbcLiveStats)
 standings = standings[0]
 
 print(type(standings))
