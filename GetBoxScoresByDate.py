@@ -57,8 +57,7 @@ def getBoxScores(boxDate = today, teamID = "0"):
     pitchingStats = SendRequest.sendRequest(pitching, "getBoxScores - pitching")
     hittingStats = SendRequest.sendRequest(hitting, "getBoxScores - hitting")
     if pitchingStats is False or hittingStats is False:
-        good = False
-        return status
+        return False
     new_hittingStats = []
     new_pitchingStats = []
 
@@ -71,20 +70,15 @@ def getBoxScores(boxDate = today, teamID = "0"):
                 # for stat in team:
                 #     print(stat + " : " + str(team[stat]))
         else:
-            good = False
+            return False
         
         if pitchingStats is not None:
             for team in pitchingStats:
                 team['stats_date'] = str(boxDate)
                 team['download_date'] = str(now)
                 new_pitchingStats.append(team)
-                # for stat in team:
-                #     print(stat + " : " + str(team[stat]))
         else:
-            good = False
+            return False
 
-    if good is True:
-        # returns list of two lists
-        return [new_hittingStats, new_pitchingStats]
-    else:
-        return False
+    # returns list of two lists
+    return [new_hittingStats, new_pitchingStats]
