@@ -1,4 +1,4 @@
-##Windows setup:
+## Windows setup:
 'py -m venv env'
 'env\Scripts\activate'
 
