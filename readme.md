@@ -1,22 +1,23 @@
 ## Windows setup:
-'py -m venv env'
-'env\Scripts\activate'
+`py -m venv env`  
+`env\Scripts\activate`  
 
-**if denied:**
-'Get-ExecutionPolicy'
-'set-executionpolicy remotesigned'
+**if denied:**  
+`Get-ExecutionPolicy`  
+`set-executionpolicy remotesigned`  
 
-##Starting Mongo (OSX):
-**from project dir:**
-'mongod --dbpath data/db'
-*^ deprecated?*
+## Starting Mongo (OSX):
+**from project dir:**  
+`mongod --dbpath data/db`  
 
-**installed brew tap**
-now:
-'brew services start mongodb-community'
-'mongo'
+*^deprecated?*  
 
-##Categories:
+**installed brew tap**  
+now:  
+`brew services start mongodb-community`  
+`mongo`  
+
+## Categories:
 - cat_4 = HR
 - cat_5 = RBI
 - cat_6 = SB
