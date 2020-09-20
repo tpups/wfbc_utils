@@ -1,8 +1,5 @@
-import json
-import requests
 from datetime import datetime
 from datetime import date
-from pymongo import MongoClient
 import SendRequest
 from TeamIDs import teamIDs
 
@@ -16,12 +13,6 @@ end = today
 if today > season_end:
     end = season_end
 
-# mongo stuff
-client = MongoClient()
-db = client.wfbc2020
-pitchingBox = db.league_box_pitching
-hittingBox = db.league_box_hitting
-
 
 def getAllLeagueBoxScores(start = season_start, end = end):
 
@@ -30,12 +21,12 @@ def getAllLeagueBoxScores(start = season_start, end = end):
     while date <= end:
         if hittingStats is not None:
             for team in hittingStats:
-                team['stats_date'] = end
+                team['stats_date'] = date
                 team['download_date'] = str(now)
 
         if pitchingStats is not None:
             for team in pitchingStats:
-                team['stats_date'] = end
+                team['stats_date'] = date
                 team['download_date'] = str(now)
 
 

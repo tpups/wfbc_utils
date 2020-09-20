@@ -1,7 +1,4 @@
-import json
-import requests
 import datetime
-import pymongo
 import SendRequest
 
 datetime_obj = datetime.datetime.now()
@@ -43,9 +40,3 @@ if standings is not None:
     print("cat_46 (ERA) : " + str(standings["cat_46"]))
     print("cat_86 (QS) : " + str(standings["cat_86"]))
     print("TOT : " + str(standings["TOT"]))
-
-
-
-from pymongo import MongoClient
-client = MongoClient()
-db = client.wfbc
