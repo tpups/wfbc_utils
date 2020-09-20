@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 from datetime import date
 from time import sleep
 import SendRequest
@@ -10,13 +10,13 @@ import UpdateDB
 season_start = date(2020, 7, 23)
 season_end = date(2020, 9, 27)
 today = date.today()
-now = datetime.now()
+now = datetime.datetime.now()
 end = today
 if today > season_end:
     end = season_end
 
 
-def getAllLeagueBoxScores(start = season_start, end = end):
+def getAllLeagueBoxScores(start = end, end = end):
 
     boxScores = []
     date = start
@@ -24,13 +24,14 @@ def getAllLeagueBoxScores(start = season_start, end = end):
     while date <= end:
         box = getBoxScores(date)
         if box is not False:
-            hit = box[0]
-            pitch = box[1]
-            # add as a list of two lists
-            boxScores.append([hit, pitch])
+            # add as a list of two lists [hit, pitch]
+            boxScores.append(box)
             date = date + oneDay
+            # wait half a sec
+            sleep(0.5)
         else:
             return False
+    return boxScores
 
 
 
