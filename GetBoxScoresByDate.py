@@ -24,11 +24,24 @@ hittingStats = SendRequest.sendRequest(hitting)
 
 print(type(hittingStats))
 
+from pymongo import MongoClient
+client = MongoClient()
+db = client.wfbc2020
+pitchingBox = db.league_box_pitching
+hittingBox = db.league_box_hitting
+
 if hittingStats is not None:
     for team in hittingStats:
-        for stat in team:
-            print(stat + " : " + str(team[stat]))
+        #for stat in team:
+            #print(stat + " : " + str(team[stat]))
+        team['stats_date'] = end_date
+        team['download_date'] = str(datetime_obj)
+        #print("team : " + str(team["team"]))
+        #print("teamID : " + str(team["teamID"]))
 
 if pitchingStats is not None:
     for team in pitchingStats:
-        print(team)
+        #for stat in team:
+            #print(stat + " : " + str(team[stat]))
+        team['stats_date'] = end_date
+        team['download_date'] = str(datetime_obj)
