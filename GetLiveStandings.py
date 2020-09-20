@@ -2,13 +2,15 @@ import json
 import requests
 import datetime
 import pymongo
-import GetStandings
+import SendRequest
 
 wfbcLiveStats = "https://www.rotowire.com/mlbcommish20/tables/standings-live.php?leagueID=163&type=S&divisionID=0"
 wfbcLiveRanks = "https://www.rotowire.com/mlbcommish20/tables/standings-live.php?leagueID=163&type=R&divisionID=0"
 
-standings = GetStandings.getStandings(wfbcLiveStats)
+standings = SendRequest.sendRequest(wfbcLiveStats)
 standings = standings[0]
+
+datetime_now =datetime.datetime.now()
 
 print(type(standings))
 
@@ -16,6 +18,7 @@ if standings is not None:
     print("Standings:")
     # for team in standings:
     #     print(team)
+    print("date: " + str(datetime_now))
     print("teamname : " + standings["teamname"])
     print("teamID : " + standings["teamID"])
     print("owner : " + standings["owner"])

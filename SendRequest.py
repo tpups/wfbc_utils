@@ -19,12 +19,11 @@ headers = {
 }
 
 
-def getStandings(url):
+def sendRequest(url):
     response = requests.get(url, headers=headers)
     print(response.status_code)
     if response.status_code == 200:
         return response.json()
     else:
         return None
-
 

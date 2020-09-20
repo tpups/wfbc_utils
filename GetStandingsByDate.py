@@ -2,7 +2,7 @@ import json
 import requests
 import datetime
 import pymongo
-import GetStandings
+import SendRequest
 
 datetime_obj = datetime.datetime.now()
 time_delta_1day = datetime.timedelta(1)
@@ -18,8 +18,8 @@ end_date = year + "-" + month + "-" + day
 
 wfbcStandingsByDate = 'https://www.rotowire.com/mlbcommish20/tables/standings-by-date.php?leagueID=163&divisionID=0&start=2020-07-23&end=' + end_date
 
-standings = GetStandings.getStandings(wfbcStandingsByDate)
-standings = standings[0]
+standings = SendRequest.sendRequest(wfbcStandingsByDate)
+standings = standings[2]
 
 print(type(standings))
 
