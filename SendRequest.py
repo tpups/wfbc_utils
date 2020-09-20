@@ -20,12 +20,12 @@ headers = {
 
 
 def sendRequest(url, origin = ""):
-    
+
     response = requests.get(url, headers=headers)
     if origin != "":
         print(origin + " : " + str(response.status_code))
     if response.status_code == 200:
         return response.json()
     else:
-        return None
+        return False
 
