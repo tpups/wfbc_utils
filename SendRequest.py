@@ -15,7 +15,7 @@ headers = {
     'Sec-Fetch-Dest': 'document',
     'Accept-Encoding': 'gzip, deflate, br',
     'Accept-Language': 'en-US,en;q=0.9,mt;q=0.8',
-    'Cookie': ***REMOVED***
+    'Cookie': '*****'
 }
 
 
