@@ -34,11 +34,8 @@ def getAllLeagueBoxScores(start = end, end = end):
     return boxScores
 
 
-
 # default is get today's league box scores
 def getBoxScores(boxDate = today, teamID = "0"):
-
-    good = True
 
     # make date string
     year = str(boxDate.year)
@@ -62,24 +59,23 @@ def getBoxScores(boxDate = today, teamID = "0"):
     new_hittingStats = []
     new_pitchingStats = []
 
-    if teamID == "0":
-        if hittingStats is not None:
-            for team in hittingStats:
-                team['stats_date'] = str(boxDate)
-                team['download_date'] = str(now)
-                new_hittingStats.append(team)
-                # for stat in team:
-                #     print(stat + " : " + str(team[stat]))
-        else:
-            return False
-        
-        if pitchingStats is not None:
-            for team in pitchingStats:
-                team['stats_date'] = str(boxDate)
-                team['download_date'] = str(now)
-                new_pitchingStats.append(team)
-        else:
-            return False
+    # add to lists
+    if hittingStats is not None:
+        for item in hittingStats:
+            item['stats_date'] = str(boxDate)
+            item['download_date'] = str(now)
+            new_hittingStats.append(item)
+            # for stat in item:
+            #     print(stat + " : " + str(item[stat]))
+    else:
+        return False
+    if pitchingStats is not None:
+        for item in pitchingStats:
+            item['stats_date'] = str(boxDate)
+            item['download_date'] = str(now)
+            new_pitchingStats.append(item)
+    else:
+        return False
 
     # returns list of two lists
     return [new_hittingStats, new_pitchingStats]
