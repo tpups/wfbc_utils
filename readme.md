@@ -1,3 +1,6 @@
+## User cookie:
+create Cookie.py and include variable cookie = "cookie"
+
 ## Windows setup:
 `py -m venv env`  
 `env\Scripts\activate`  

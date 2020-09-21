@@ -4,8 +4,8 @@ from UpdateDB import updateBox
 box = getAllLeagueBoxScores()
 
 if box is not False:
-    # pass in true updates league box
+    # pass in true updates league box, false for team box
     if updateBox(box, True) is True:
-        print('Great Success')
+        print('Box scores were updated')
     else:
-        print('Unfathomable failure')
+        print('No box scores to update')
