@@ -22,6 +22,7 @@ def updateBox(stats, isLeagueStats = True):
         # TODO - stats are coming in with extra list wrapper
         hit = stats[0][0]
         pitch = stats[0][1]
+
         hitToUpdate = []
         pitchToUpdate = []
         for doc in hit:
@@ -32,6 +33,7 @@ def updateBox(stats, isLeagueStats = True):
             checkResult = checkPrevious(doc, "pitch", isLeagueStats)
             if checkResult is True:
                 pitchToUpdate.append(doc)
+
         hitting_result = None
         pitching_result = None
         if hitToUpdate:
@@ -47,32 +49,40 @@ def updateBox(stats, isLeagueStats = True):
             print("days of box scores retrieved: " + str(len(stats)))
             pprint.pprint(hittingBox.find_one())
             pprint.pprint(pitchingBox.find_one())
-            # pprint.pprint(stats)
             return True
         else:
             return False
 
 
-def checkPrevious(document, type = "", league = True):
+def checkPrevious(document, side = "", league = True):
 
-    status = { "hit": {}, "pitch": {} }
-    # is this the first time data has been entered for this date?
-    newDate = True
-    unchanged = None
+    if side != "":
+        status = { "hit": {}, "pitch": {} }
+        # is this the first time data has been entered for this date?
+        newDate = True
+        unchanged = None
+        collection = None
 
-    if type is "hit":
-        hittingBox = db.league_box_hitting
-        cats = ['2B','3B','AB','AVG','BB','CS','GP','H','HBP','HR','K','OPS','PA','R','RBI','SB','SF']
-        if league is False:
-            hittingBox = db.team_box_hitting
+        if side is "hit":
+            cats = ['2B','3B','AB','AVG','BB','CS','GP','H','HBP','HR','K','OPS','PA','R','RBI','SB','SF']
+            collection = db.league_box_hitting
+            if league is False:
+                collection = db.team_box_hitting
+        if side is "pitch":
+            cats = ['BB','BS','ER','ERA','GP','H','HB','HR','IP','K','L','QS','R','SV','W','WHIP','WP']
+            collection = db.league_box_pitching
+            if league is False:
+                collection = db.team_box_pitching
+
         teamID = document['teamID']
         stats_date = document['stats_date']
-        previous_documents = hittingBox.find({"teamID": teamID, "stats_date": stats_date})
+        previous_documents = collection.find({"teamID": teamID, "stats_date": stats_date})
         previous_document = None
         previous_count = previous_documents.count()
+
         if previous_count != 0:
             newDate = False
-            # print("found " + str(previous_count) + " previous hitting data for this date")
+            # print("found " + str(previous_count) + " previous (" + side + ") data for this date")
             previous_document = previous_documents[previous_count - 1]
             for cat in cats:
                 # check the last document
@@ -80,53 +90,30 @@ def checkPrevious(document, type = "", league = True):
                     if document[cat] != previous_document[cat]:
                         status["hit"][cat] = "values do not match"
                         unchanged = False
-                        update_result = updateDocument(hittingBox, previous_document['_id'], cat, previous_document[cat], document[cat])
+                        update_result = updateDocument(collection, previous_document['_id'], cat, previous_document[cat], document[cat])
                         print("number of documents updated: " + str(update_result))
                 elif cat in document or cat in previous_document:
                     status["hit"][cat] = "only one document contains key"
                     unchanged = False
 
-    if type is "pitch":
-        pitchingBox = db.league_box_pitching
-        cats = ['BB','BS','ER','ERA','GP','H','HB','HR','IP','K','L','QS','R','SV','W','WHIP','WP']
-        if league is False:
-            pitchingBox = db.team_box_pitching
-        teamID = document['teamID']
-        stats_date = document['stats_date']
-        previous_documents = pitchingBox.find({"teamID": teamID, "stats_date": stats_date})
-        previous_document = None
-        previous_count = previous_documents.count()
-        if previous_count != 0:
-            newDate = False
-            # print("found " + str(previous_count) + " previous pitching data for this date")
-            previous_document = previous_documents[previous_count - 1]
-            for cat in cats:
-                if cat in document and cat in previous_document:
-                    if document[cat] != previous_document[cat]:
-                        status["pitch"][cat] = "values do not match"
-                        print("values do not match")
-                        unchanged = False
-                        update_result = updateDocument(pitchingBox, previous_document['_id'], cat, previous_document[cat], document[cat])
-                        print("number of documents updated: " + str(update_result))
-                elif cat in document or cat in previous_document:
-                    status["pitch"][cat] = "only one document contains key"
-                    unchanged = False
-
-    if newDate is True:
-        return True
+        if newDate is True:
+            return True
+        else:
+            return False
     else:
-        return False
+        return
 
 
 def updateDocument(db, _id, cat, old_value = None, new_value = None):
 
-    doc = db.find_one({"_id": _id})
     # let's make updates a list of strings
     updates = []
+    doc = db.find_one({"_id": _id})
     if doc['updates']:
         updates = doc['updates']
+    # add something about the update
     updates.append(datetime.datetime.now() + " ::: changed " + cat + " from " + old_value + " to " + new_value)
+    # make the update
     result = db.update_one( {"_id": _id}, {"$set": {cat:new_value, "updates": updates}}, upsert=True )
-
     # return the number of documents updated
     return result['modifiedCount']
