@@ -1,6 +1,7 @@
 import datetime
 from datetime import date
 from time import sleep
+import arrow
 import SendRequest
 from TeamIDs import teamIDs
 import UpdateDB
@@ -9,8 +10,9 @@ import UpdateDB
 # 2020 season end = September 27
 season_start = date(2020, 7, 23)
 season_end = date(2020, 9, 27)
-today = date.today()
-now = datetime.datetime.now()
+utcnow = arrow.utcnow()
+pstnow = utcnow.to('US/Pacific')
+today = pstnow.date()
 end = today
 if today > season_end:
     end = season_end
@@ -63,7 +65,7 @@ def getBoxScores(boxDate = today, teamID = "0"):
     if hittingStats is not None:
         for item in hittingStats:
             item['stats_date'] = str(boxDate)
-            item['download_date'] = str(now)
+            item['download_date'] = str(pstnow)
             new_hittingStats.append(item)
             # for stat in item:
             #     print(stat + " : " + str(item[stat]))
@@ -72,7 +74,7 @@ def getBoxScores(boxDate = today, teamID = "0"):
     if pitchingStats is not None:
         for item in pitchingStats:
             item['stats_date'] = str(boxDate)
-            item['download_date'] = str(now)
+            item['download_date'] = str(pstnow)
             new_pitchingStats.append(item)
     else:
         return False

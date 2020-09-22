@@ -1,6 +1,11 @@
 ## User cookie:
 create Cookie.py and include variable cookie = "cookie"
 
+## Packages:
+`pip install pymongo`
+`pip install MLB-StatsAPI`
+`pip install -U arrow`
+
 ## Windows setup:
 `py -m venv env`  
 `env\Scripts\activate`  

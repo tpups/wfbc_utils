@@ -1,6 +1,10 @@
 from pymongo import MongoClient
 import pprint
 import datetime
+import arrow
+
+utcnow = arrow.utcnow()
+pstnow = utcnow.to('US/Pacific')
 
 # mongo stuff
 client = MongoClient()
@@ -109,11 +113,11 @@ def updateDocument(db, _id, cat, old_value = None, new_value = None):
     # let's make updates a list of strings
     updates = []
     doc = db.find_one({"_id": _id})
-    if doc['updates']:
+    if 'updates' in doc:
         updates = doc['updates']
     # add something about the update
-    updates.append(datetime.datetime.now() + " ::: changed " + cat + " from " + old_value + " to " + new_value)
+    updates.append(str(pstnow) + " ::: changed " + str(cat) + " from " + str(old_value) + " to " + str(new_value))
     # make the update
     result = db.update_one( {"_id": _id}, {"$set": {cat:new_value, "updates": updates}}, upsert=True )
     # return the number of documents updated
-    return result['modifiedCount']
+    return result.modified_count
