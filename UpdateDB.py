@@ -29,33 +29,37 @@ def updateBox(stats, isLeagueStats = True):
 
         hitToUpdate = []
         pitchToUpdate = []
+        updateExisting = False
+        newEntry = False
         for doc in hit:
             checkResult = checkPrevious(doc, "hit", isLeagueStats)
-            if checkResult is True:
+            if checkResult['newEntry'] is True:
                 hitToUpdate.append(doc)
+            if checkResult['updateExisting'] is True:
+                updateExisting = True
         for doc in pitch:
             checkResult = checkPrevious(doc, "pitch", isLeagueStats)
-            if checkResult is True:
+            if checkResult['newEntry'] is True:
                 pitchToUpdate.append(doc)
+            if checkResult['updateExisting'] is True:
+                updateExisting = True
 
         hitting_result = None
         pitching_result = None
-        if hitToUpdate:
+        if len(hitToUpdate) > 0:
             hitting_result = hittingBox.insert_many(hitToUpdate)
-        if pitchToUpdate:
+            newEntry = True
+        if len(pitchToUpdate):
             pitching_result = pitchingBox.insert_many(pitchToUpdate)
+            newEntry = True
 
         # delete all docs in collections
         # hitting_result = hittingBox.delete_many({})
         # pitching_result = pitchingBox.delete_many({})
 
-        if pitching_result is not None or hitting_result is not None:
-            print("days of box scores retrieved: " + str(len(stats)))
-            pprint.pprint(hittingBox.find_one())
-            pprint.pprint(pitchingBox.find_one())
-            return True
-        else:
-            return False
+        print("days of box scores retrieved: " + str(len(stats)))
+        return {'newEntry': newEntry,
+                'updateExisting': updateExisting}
 
 
 def checkPrevious(document, side = "", league = True):
@@ -63,8 +67,8 @@ def checkPrevious(document, side = "", league = True):
     if side != "":
         status = { "hit": {}, "pitch": {} }
         # is this the first time data has been entered for this date?
-        newDate = True
-        unchanged = None
+        newEntry = True
+        updateExisting = False
         collection = None
 
         if side is "hit":
@@ -85,7 +89,7 @@ def checkPrevious(document, side = "", league = True):
         previous_count = previous_documents.count()
 
         if previous_count != 0:
-            newDate = False
+            newEntry = False
             # print("found " + str(previous_count) + " previous (" + side + ") data for this date")
             previous_document = previous_documents[previous_count - 1]
             for cat in cats:
@@ -93,17 +97,15 @@ def checkPrevious(document, side = "", league = True):
                 if cat in document and cat in previous_document:
                     if document[cat] != previous_document[cat]:
                         status["hit"][cat] = "values do not match"
-                        unchanged = False
+                        updateExisting = False
                         update_result = updateDocument(collection, previous_document['_id'], cat, previous_document[cat], document[cat])
                         print("number of documents updated: " + str(update_result))
                 elif cat in document or cat in previous_document:
                     status["hit"][cat] = "only one document contains key"
-                    unchanged = False
+                    updateExisting = False
 
-        if newDate is True:
-            return True
-        else:
-            return False
+        return {'newEntry': newEntry,
+                'updateExisting': updateExisting}
     else:
         return
 
