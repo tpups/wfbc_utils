@@ -1,8 +1,16 @@
 import arrow
-from datetime import datetime
-from GetBoxScoresByDate import getAllLeagueBoxScores
-from UpdateDB import updateBox
+from pymongo import MongoClient
+import datetime
+from datetime import date
+from UpdateDB import updateBox, db
 import GetMlbStats
+from GetBoxScoresByDate import getAllLeagueBoxScores
+from inputs import utcnow, pstnow, season_start, season_end, db
+from BuildStandings import buildStandings
+
+# create timezone-aware(double check this) date to pass in:
+# dz = arrow.get(datetime(2020, 9, 24), 'US/Pacific').date()
+
 
 box = getAllLeagueBoxScores()
 
@@ -16,14 +24,12 @@ if box is not False:
     elif updateResult['newEntry'] is False and updateResult['updateExisting'] is False:
         print('No box scores to update')
 
+# league stats
+hittingBox = db.league_box_hitting
+pitchingBox = db.league_box_pitching
 
-# create date to pass in:
-# games_date = arrow.get(datetime(2020, 9, 24), 'US/Pacific').date()
-# end_date = arrow.get(datetime(2020, 10, 3), 'US/Pacific').date()
+buildStandings(season_start, season_end, hittingBox, pitchingBox)
 
 firstPitch = GetMlbStats.getFirstPitch()
 if firstPitch is False:
     print('no games on this day')
-
-# test = GetMlbStats.getSchedule(games_date, end_date)
-# print('Got ' + str(len(test)) + ' games')

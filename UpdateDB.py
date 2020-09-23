@@ -3,25 +3,17 @@ import pprint
 import datetime
 from datetime import date
 import arrow
-from BuildStandings import buildStandings
+from inputs import utcnow, pstnow, season_start, season_end, db
 
-utcnow = arrow.utcnow()
-pstnow = utcnow.to('US/Pacific')
-season_start = date(2020, 7, 23)
-season_end = date(2020, 9, 27)
-
-# mongo stuff
-client = MongoClient()
-db = client.wfbc2020
-# league stats
-hittingBox = db.league_box_hitting
-pitchingBox = db.league_box_pitching
 
 # todo - how to insert so can retrieve to compare with most recent pull
 
 def updateBox(stats, isLeagueStats = True):
 
     if stats is not None:
+        # league stats
+        hittingBox = db.league_box_hitting
+        pitchingBox = db.league_box_pitching
         pprint.pprint(stats)
         # team stats
         if isLeagueStats is False:
@@ -129,5 +121,6 @@ def updateDocument(db, _id, cat, old_value = None, new_value = None):
     # return the number of documents updated
     return result.modified_count
 
-def updateStandings(startDate = season_start, endDate = season_end):
-    standings = buildStandings(startDate, endDate, hittingBox, pitchingBox)
+# def updateStandings(startDate = season_start, endDate = season_end):
+#     standings = buildStandings(startDate, endDate, hittingBox, pitchingBox)
+#     return True

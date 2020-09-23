@@ -1,14 +1,11 @@
 import statsapi
 import arrow
 from datetime import datetime
+from inputs import utcnow, pstnow, today
 
-utcnow = arrow.utcnow()
-pstnow = utcnow.to('US/Pacific')
-today = pstnow.date()
 formatToday = pstnow.format('MMMM Do, YYYY')
 
 # TODO : any way to get MLB league-wide stats? Need to calculate cFIP
-
 
 # returns a list of games
 def getSchedule(gamesDate = today, rangeEndDate = None):
@@ -39,16 +36,7 @@ def getFirstPitch(gamesDate = today):
                 if gameFirstPitch < dayFirstPitch:
                     firstGames = []
                 firstGames.append(game)
-        # print('*******************') 
-        # print('first pitch : ' + str(gameFirstPitch))
-        # print('first pitch : ' + str(pstGameFirstPitch))
-        # print('status : ' + game['status'])
-        # print('game_type : ' + game['game_type'])
-        # print('doubleheader : ' + game['doubleheader'])
-        # print('current_inning : ' + str(game['current_inning']))
-        # print('away_name : ' + game['away_name'])
-        # print('home_name : ' + game['home_name'])
-        # print('*******************') 
+
     if dayFirstPitch is not None:
         pstFirstPitch = dayFirstPitch.to('US/Pacific')
         formatFirstPitch = pstFirstPitch.format('h:mm A ZZZ')
@@ -58,7 +46,3 @@ def getFirstPitch(gamesDate = today):
         return pstFirstPitch
     else:
         return False
-
-
-
-

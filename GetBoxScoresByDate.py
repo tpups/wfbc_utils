@@ -3,22 +3,14 @@ from datetime import date
 from time import sleep
 import arrow
 import SendRequest
-from TeamIDs import teamIDs
-import UpdateDB
+from inputs import season_start, season_end, utcnow, pstnow, today
 
-# 2020 season start = July 23
-# 2020 season end = September 27
-season_start = date(2020, 7, 23)
-season_end = date(2020, 9, 27)
-utcnow = arrow.utcnow()
-pstnow = utcnow.to('US/Pacific')
-today = pstnow.date()
 end = today
 if today > season_end:
     end = season_end
 
 
-def getAllLeagueBoxScores(start = end, end = end):
+def getAllLeagueBoxScores(start = season_start, end = end):
 
     boxScores = []
     date = start

@@ -4,8 +4,11 @@ from datetime import date
 import pprint
 import GetStats
 from TeamIDs import teamIDsByManager, teamManagersByID, teamNamesByID
+from inputs import numTeams, season_start, season_end, db
 
-numTeams = 12
+# TODO
+# 1) Build standings as they were on this date
+# 2) Build standings after box scores from postponed games have been retroactively added
 
 def buildStandings(startDate, endDate, hitDB, pitchDB):
 
@@ -20,41 +23,34 @@ def buildStandings(startDate, endDate, hitDB, pitchDB):
         try:
             for cat in hittingCats:
                 hitting[cat] = []
-                for teamID in teamIDsByManager:
-                    team = teamTotals[teamIDsByManager[teamID]]['hit']
+                for manager in teamIDsByManager:
+                    team = teamTotals[teamIDsByManager[manager]]['hit']
                     hittingStat = None
                     if cat == 'AVG':
                         hittingStat = GetStats.getAVG(int(team['H']), int(team['AB']))
-                        # print(hittingStat)
                     elif cat == 'OPS':
                         obp = GetStats.getOBP(int(team['AB']), int(team['H']), int(team['BB']), int(team['HBP']), int(team['SF']))
                         totalBases = GetStats.getTotalBases(int(team['H']), int(team['2B']), int(team['3B']), int(team['HR']))
                         slg = GetStats.getSLG(totalBases, int(team['AB']))
                         hittingStat = GetStats.getOPS(obp, slg)
-                        # print(hittingStat)
                     else:
                         hittingStat = int(team[cat])
-                        # print(hittingStat)
-                    hitting[cat].append({ 'teamID': teamIDsByManager[teamID], 'value': hittingStat })
+                    hitting[cat].append({ 'teamID': teamIDsByManager[manager], 'value': hittingStat, 'manager': manager, 'name': teamNamesByID[teamIDsByManager[manager]] })
 
             for cat in pitchingCats:
                 pitching[cat] = []
-                for teamID in teamIDsByManager:
-                    team = teamTotals[teamIDsByManager[teamID]]['pitch']
+                for manager in teamIDsByManager:
+                    team = teamTotals[teamIDsByManager[manager]]['pitch']
                     pitchingStat = None
                     if cat == 'ERA':
                         pitchingStat = GetStats.getERA(int(team['ER']), Decimal(team['IP']))
-                        # print(pitchingStat)
                     elif cat == 'WHIP':
                         pitchingStat = GetStats.getWHIP(int(team['H']), int(team['BB']), Decimal(team['IP']))
-                        # print(pitchingStat)
                     elif cat == 'IP':
                         pitchingStat = Decimal(team[cat])
-                        # print(pitchingStat)
                     else:
                         pitchingStat = int(team[cat])
-                        # print(pitchingStat)
-                    pitching[cat].append({ 'teamID': teamIDsByManager[teamID], 'value': pitchingStat })
+                    pitching[cat].append({ 'teamID': teamIDsByManager[manager], 'value': pitchingStat, 'manager': manager, 'name': teamNamesByID[teamIDsByManager[manager]] })
         except:
             return False
 
@@ -63,43 +59,61 @@ def buildStandings(startDate, endDate, hitDB, pitchDB):
         for cat in hittingCats:
             statTotals = hitting[cat]
             sortedTotals = sorted(statTotals, key = lambda i: i['value'], reverse=True)
-            print(cat)
-            print("###############")
             
             i = 0
             while i < len(sortedTotals):
                 team = sortedTotals[i]
-                owner = teamManagersByID[team['teamID']]
-                name = teamNamesByID[team['teamID']]
-                team['manager'] = owner
-                team['name'] = name
-                print(owner + "(" + name +  ") : " + str(team['value']))
-
                 nextValue = None
                 n = i + 1
                 count = 1
                 while n < len(sortedTotals):
                     if sortedTotals[n] is not None:
-                        nextValue = sortedTotals[n]
+                        nextValue = sortedTotals[n]['value']
                         if nextValue == team['value']:
                             count += 1
                             n += 1
                         else:
                             break
+
                 if count > 1:
-                    temp = "temp"
+                    # print("found tie : " + str(count) + " tied teams")
+                    tiedPointsTotal = 0
+                    for p in range(count):
+                        tiedPointsTotal += points[i + p]
+                    pointsEach = Decimal(tiedPointsTotal / count)
+                    onePlace = Decimal('1.1')
+                    team['points'] = str(pointsEach.quantize(onePlace))
+                    # assign points to the other tied teams as they will be skipped by i+= count
+                    for t in range(count - 1):
+                        idx = i + t + 1
+                        sortedTotals[idx]['points'] = str(pointsEach.quantize(onePlace))
+                else:
+                    team['points'] = points[i]
+
                 i += count
+            hittingPoints[cat] = sortedTotals
+        
+        teamTotals = {}
+        for cat in hittingPoints:
+            for team in hittingPoints[cat]:
+                if team['teamID'] in teamTotals:
+                    teamTotals[team['teamID']]['total'] += Decimal(team['points'])
+                else:
+                    teamTotals[team['teamID']] = {'total': Decimal(team['points'])}
+                teamTotals[team['teamID']][cat] = team['points']
+        totalPoints = []
+        # teamID is the key so we should add kv pair so it's not lost
+        for team in teamTotals:
+            teamTotals[team]['teamID'] = team
+            totalPoints.append(teamTotals[team])
+        
+        hittingPoints['totals'] = sorted(totalPoints, key = lambda i: i['total'], reverse=True)
+        for team in hittingPoints['totals']:
+            print("ID: " + str(team['teamID']) + " ::: " + str(team['total']) + " Points")
 
-            print("###############")
-            print(points)
 
+        return True
 
-
-
-
-# Build standings as they were on this date
-
-# Build standings after box scores from postponed games have been retroactively added
 
 def getTeamTotals(startDate, endDate, hitDb, pitchDb):
 
@@ -150,26 +164,5 @@ def getTeamTotals(startDate, endDate, hitDb, pitchDb):
                         team[stat] = str(newTotal)
     except:
         return False
-    # josh = teamIDsByManager["Josh"]
-    # print(josh)
-    # joshTotals = totals[josh]["hit"]
-    # runs = joshTotals["R"]
-    # joshPitch = totals[josh]["pitch"]
-    # er = joshPitch["ER"]
-    # print(runs)
-    # print(er)
+
     return totals
-
-
-
-
-# mongo stuff
-client = MongoClient()
-db = client.wfbc2020
-# league stats
-hittingBox = db.league_box_hitting
-pitchingBox = db.league_box_pitching
-season_start = date(2020, 7, 23)
-season_end = date(2020, 9, 24)
-
-buildStandings(season_start, season_end, hittingBox, pitchingBox)
