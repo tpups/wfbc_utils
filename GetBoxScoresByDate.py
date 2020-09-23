@@ -67,8 +67,8 @@ def getBoxScores(boxDate = today, teamID = "0"):
             item['stats_date'] = str(boxDate)
             item['download_date'] = str(pstnow)
             new_hittingStats.append(item)
-            # for stat in item:
-            #     print(stat + " : " + str(item[stat]))
+            for stat in item:
+                print(stat + " : " + str(item[stat]))
     else:
         return False
     if pitchingStats is not None:
@@ -76,6 +76,8 @@ def getBoxScores(boxDate = today, teamID = "0"):
             item['stats_date'] = str(boxDate)
             item['download_date'] = str(pstnow)
             new_pitchingStats.append(item)
+            for stat in item:
+                print(stat + " : " + str(item[stat]))
     else:
         return False
 

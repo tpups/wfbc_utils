@@ -1,6 +1,8 @@
+import arrow
+from datetime import datetime
 from GetBoxScoresByDate import getAllLeagueBoxScores
 from UpdateDB import updateBox
-from GetMlbStats import getFirstPitch
+import GetMlbStats
 
 box = getAllLeagueBoxScores()
 
@@ -14,4 +16,14 @@ if box is not False:
     elif updateResult['newEntry'] is False and updateResult['updateExisting'] is False:
         print('No box scores to update')
 
-getFirstPitch()
+
+# create date to pass in:
+# games_date = arrow.get(datetime(2020, 9, 24), 'US/Pacific').date()
+# end_date = arrow.get(datetime(2020, 10, 3), 'US/Pacific').date()
+
+firstPitch = GetMlbStats.getFirstPitch()
+if firstPitch is False:
+    print('no games on this day')
+
+# test = GetMlbStats.getSchedule(games_date, end_date)
+# print('Got ' + str(len(test)) + ' games')

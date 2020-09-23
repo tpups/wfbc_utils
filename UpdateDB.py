@@ -1,23 +1,28 @@
 from pymongo import MongoClient
 import pprint
 import datetime
+from datetime import date
 import arrow
+from BuildStandings import buildStandings
 
 utcnow = arrow.utcnow()
 pstnow = utcnow.to('US/Pacific')
+season_start = date(2020, 7, 23)
+season_end = date(2020, 9, 27)
 
 # mongo stuff
 client = MongoClient()
 db = client.wfbc2020
+# league stats
+hittingBox = db.league_box_hitting
+pitchingBox = db.league_box_pitching
 
 # todo - how to insert so can retrieve to compare with most recent pull
 
 def updateBox(stats, isLeagueStats = True):
 
     if stats is not None:
-        # league stats
-        hittingBox = db.league_box_hitting
-        pitchingBox = db.league_box_pitching
+        pprint.pprint(stats)
         # team stats
         if isLeagueStats is False:
             hittingBox = db.team_box_hitting
@@ -97,12 +102,12 @@ def checkPrevious(document, side = "", league = True):
                 if cat in document and cat in previous_document:
                     if document[cat] != previous_document[cat]:
                         status["hit"][cat] = "values do not match"
-                        updateExisting = False
+                        updateExisting = True
                         update_result = updateDocument(collection, previous_document['_id'], cat, previous_document[cat], document[cat])
-                        print("number of documents updated: " + str(update_result))
+                        # print("number of documents updated: " + str(update_result))
                 elif cat in document or cat in previous_document:
                     status["hit"][cat] = "only one document contains key"
-                    updateExisting = False
+                    updateExisting = True
 
         return {'newEntry': newEntry,
                 'updateExisting': updateExisting}
@@ -123,3 +128,6 @@ def updateDocument(db, _id, cat, old_value = None, new_value = None):
     result = db.update_one( {"_id": _id}, {"$set": {cat:new_value, "updates": updates}}, upsert=True )
     # return the number of documents updated
     return result.modified_count
+
+def updateStandings(startDate = season_start, endDate = season_end):
+    standings = buildStandings(startDate, endDate, hittingBox, pitchingBox)
