@@ -32,4 +32,4 @@ buildStandings(season_start, season_end, hittingBox, pitchingBox)
 
 firstPitch = GetMlbStats.getFirstPitch()
 if firstPitch is False:
-    print('no games on this day')
+    print('No games on this day')

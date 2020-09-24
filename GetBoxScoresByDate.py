@@ -35,9 +35,9 @@ def getBoxScores(boxDate = today, teamID = "0"):
     year = str(boxDate.year)
     month = str(boxDate.month)
     day = str(boxDate.day)
-    if len(month) is 1:
+    if len(month) == 1:
         month = "0" + month
-    if len(day) is 1:
+    if len(day) == 1:
         day = "0" + day
     date = year + "-" + month + "-" + day
 
@@ -59,8 +59,6 @@ def getBoxScores(boxDate = today, teamID = "0"):
             item['stats_date'] = str(boxDate)
             item['download_date'] = str(pstnow)
             new_hittingStats.append(item)
-            for stat in item:
-                print(stat + " : " + str(item[stat]))
     else:
         return False
     if pitchingStats is not None:
@@ -68,8 +66,6 @@ def getBoxScores(boxDate = today, teamID = "0"):
             item['stats_date'] = str(boxDate)
             item['download_date'] = str(pstnow)
             new_pitchingStats.append(item)
-            for stat in item:
-                print(stat + " : " + str(item[stat]))
     else:
         return False
 

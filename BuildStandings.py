@@ -2,6 +2,7 @@ from decimal import Decimal
 from pymongo import MongoClient
 from datetime import date
 import pprint
+import sys
 import GetStats
 from TeamIDs import teamIDsByManager, teamManagersByID, teamNamesByID
 from inputs import numTeams, season_start, season_end, db
@@ -52,10 +53,15 @@ def buildStandings(startDate, endDate, hitDB, pitchDB):
                         pitchingStat = int(team[cat])
                     pitching[cat].append({ 'teamID': teamIDsByManager[manager], 'value': pitchingStat, 'manager': manager, 'name': teamNamesByID[teamIDsByManager[manager]] })
         except:
+            print("Unexpected error!!")
+            e = sys.exc_info()
+            for i in e:
+                print(i)
             return False
 
         hittingPoints = {}
         pitchingPoints = {}
+        # HITTING
         for cat in hittingCats:
             statTotals = hitting[cat]
             sortedTotals = sorted(statTotals, key = lambda i: i['value'], reverse=True)
@@ -66,6 +72,47 @@ def buildStandings(startDate, endDate, hitDB, pitchDB):
                 nextValue = None
                 n = i + 1
                 count = 1
+                # look for ties
+                while n < len(sortedTotals):
+                    if sortedTotals[n] is not None:
+                        nextValue = sortedTotals[n]['value']
+                        if nextValue == team['value']:
+                            count += 1
+                            n += 1
+                        else:
+                            break
+                # if ties, figure out points
+                if count > 1:
+                    tiedPointsTotal = 0
+                    for p in range(count):
+                        tiedPointsTotal += points[i + p]
+                    pointsEach = Decimal(tiedPointsTotal / count)
+                    onePlace = Decimal('1.1')
+                    team['points'] = str(pointsEach.quantize(onePlace))
+                    # assign points to the other tied teams as they will be skipped by i+= count
+                    for t in range(count - 1):
+                        idx = i + t + 1
+                        sortedTotals[idx]['points'] = str(pointsEach.quantize(onePlace))
+                else:
+                    team['points'] = points[i]
+
+                i += count
+            hittingPoints[cat] = sortedTotals
+        # PITCHING
+        for cat in pitchingCats:
+            statTotals = pitching[cat]
+            reverse = True
+            if cat == "ERA" or cat == "WHIP":
+                reverse = False
+            sortedTotals = sorted(statTotals, key = lambda i: i['value'], reverse=reverse)
+            
+            i = 0
+            while i < len(sortedTotals):
+                team = sortedTotals[i]
+                nextValue = None
+                n = i + 1
+                count = 1
+                # look for ties
                 while n < len(sortedTotals):
                     if sortedTotals[n] is not None:
                         nextValue = sortedTotals[n]['value']
@@ -91,26 +138,63 @@ def buildStandings(startDate, endDate, hitDB, pitchDB):
                     team['points'] = points[i]
 
                 i += count
-            hittingPoints[cat] = sortedTotals
-        
+            pitchingPoints[cat] = sortedTotals
+        # teamTotals will contain hitting & pitching totals
         teamTotals = {}
+        for team in teamIDsByManager:
+            teamTotals[teamIDsByManager[team]] = {
+                'totalHit': Decimal(0),
+                'totalPitch': Decimal(0),
+                'total': Decimal(0),
+                'teamID': teamIDsByManager[team]
+            }
+        # HITTING
         for cat in hittingPoints:
             for team in hittingPoints[cat]:
-                if team['teamID'] in teamTotals:
-                    teamTotals[team['teamID']]['total'] += Decimal(team['points'])
-                else:
-                    teamTotals[team['teamID']] = {'total': Decimal(team['points'])}
-                teamTotals[team['teamID']][cat] = team['points']
-        totalPoints = []
-        # teamID is the key so we should add kv pair so it's not lost
-        for team in teamTotals:
-            teamTotals[team]['teamID'] = team
-            totalPoints.append(teamTotals[team])
-        
-        hittingPoints['totals'] = sorted(totalPoints, key = lambda i: i['total'], reverse=True)
-        for team in hittingPoints['totals']:
-            print("ID: " + str(team['teamID']) + " ::: " + str(team['total']) + " Points")
+                _team = teamTotals[team['teamID']]
+                points = team['points']
+                _team['totalHit'] += Decimal(points)
+                _team[cat] = points
+        # PITCHING
+        for cat in pitchingPoints:
+            for team in pitchingPoints[cat]:
+                _team = teamTotals[team['teamID']]
+                points = team['points']
+                _team['totalPitch'] += Decimal(points)
+                _team[cat] = points
 
+        # put teams into a list so we can sort them
+        totalPoints = []
+        for team in teamTotals:
+            _team = teamTotals[team]
+            hitPlusPitch = Decimal(_team['totalHit']) + Decimal(_team['totalPitch'])
+            _team['hitPlusPitch'] = hitPlusPitch
+            totalPoints.append(_team)
+
+
+        
+        print('### HITTING ###')
+        hittingPoints['totals'] = sorted(totalPoints, key = lambda i: i['totalHit'], reverse=True)
+        for team in hittingPoints['totals']:
+            print("ID: " + str(team['teamID']) + " ::: " + teamManagersByID[str(team['teamID'])] + " ::: " + str(team['totalHit']) + " Points")
+        print('### PITCHING ###')
+        pitchingPoints['totals'] = sorted(totalPoints, key = lambda i: i['totalPitch'], reverse=True)
+        for team in pitchingPoints['totals']:
+            print("ID: " + str(team['teamID']) + " ::: " + teamManagersByID[str(team['teamID'])] + " ::: " + str(team['totalPitch']) + " Points")
+        print('### STANDINGS ###')
+        standings = sorted(totalPoints, key = lambda i: i['hitPlusPitch'], reverse=True)
+        for team in standings:
+            print("ID: " + str(team['teamID']) + " ::: " + teamManagersByID[str(team['teamID'])] + " ::: " + str(team['hitPlusPitch']) + " Points")
+        for cat in hittingPoints:
+            if cat != "totals":
+                print("---- " + str(cat) + " ---")
+                for team in hittingPoints[cat]:
+                    print("ID: " + str(team['teamID']) + " ::: " + teamManagersByID[str(team['teamID'])] + " ::: " + str(team['value']) + " ::: " + str(team['points']) + " Points")
+        for cat in pitchingPoints:
+            if cat != "totals":
+                print("---- " + str(cat) + " ---")
+                for team in pitchingPoints[cat]:
+                    print("ID: " + str(team['teamID']) + " ::: " + teamManagersByID[str(team['teamID'])] + " ::: " + str(team['value']) + " ::: " + str(team['points']) + " Points")
 
         return True
 
@@ -163,6 +247,10 @@ def getTeamTotals(startDate, endDate, hitDb, pitchDb):
                         newTotal = int(currentTotal) + int(score[stat])
                         team[stat] = str(newTotal)
     except:
+        print("Unexpected error!!")
+        e = sys.exc_info()
+        for i in e:
+            print(i)
         return False
 
     return totals
