@@ -9,8 +9,8 @@ import arrow
 
 # 2021 season start = April 1
 # 2021 season end = October 3
-season_start = date(2020, 4, 1)
-season_end = date(2020, 10, 3)
+season_start = date(2021, 4, 1)
+season_end = date(2021, 10, 3)
 
 # DATES AND TIMES
 utcnow = arrow.utcnow()
@@ -22,4 +22,4 @@ numTeams = 12
 
 # mongo stuff
 client = MongoClient()
-db = client.wfbc2020
+db = client.wfbc2021
