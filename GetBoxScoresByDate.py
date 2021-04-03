@@ -42,8 +42,10 @@ def getBoxScores(boxDate = today, teamID = "0"):
     date = year + "-" + month + "-" + day
 
     # API endpoints
-    pitching = "https://www.rotowire.com/mlbcommish20/tables/box.php?leagueID=163&teamID=" + teamID + "&date=" + date + "&borp=P"
-    hitting = "https://www.rotowire.com/mlbcommish20/tables/box.php?leagueID=163&teamID=" + teamID + "&date=" + date + "&borp=B"
+    # pitching = "https://www.rotowire.com/mlbcommish20/tables/box.php?leagueID=163&teamID=" + teamID + "&date=" + date + "&borp=P"
+    # hitting = "https://www.rotowire.com/mlbcommish20/tables/box.php?leagueID=163&teamID=" + teamID + "&date=" + date + "&borp=B"
+    pitching = "https://www.rotowire.com/mlbcommish20/tables/box.php?leagueID=56&teamID=" + teamID + "&date=" + date + "&borp=P"
+    hitting = "https://www.rotowire.com/mlbcommish20/tables/box.php?leagueID=56&teamID=" + teamID + "&date=" + date + "&borp=B"
 
     # get them stats
     pitchingStats = SendRequest.sendRequest(pitching, "getBoxScores - pitching")
