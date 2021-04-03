@@ -9,8 +9,8 @@ import arrow
 
 # 2021 season start = April 1
 # 2021 season end = October 3
-season_start = date(2020, 7, 23)
-season_end = date(2020, 9, 27)
+season_start = date(2020, 4, 1)
+season_end = date(2020, 10, 3)
 
 # DATES AND TIMES
 utcnow = arrow.utcnow()
