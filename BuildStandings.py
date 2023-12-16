@@ -4,14 +4,14 @@ from datetime import date
 import pprint
 import sys
 import GetStats
-from TeamIDs import teamIDsByManager, teamManagersByID, teamNamesByID
-from inputs import numTeams, season_start, season_end, db
+from teams import teamIDs
+from inputs import numTeams, db
 
 # TODO
 # 1) Build standings as they were on this date
 # 2) Build standings after box scores from postponed games have been retroactively added
 
-def buildStandings(startDate, endDate, hitDB, pitchDB):
+def buildStandings(year, startDate, endDate, hitDB, pitchDB):
 
     teamTotals = getTeamTotals(startDate, endDate, hitDB, pitchDB)
     points = list(reversed(range(1, numTeams + 1)))
@@ -24,8 +24,8 @@ def buildStandings(startDate, endDate, hitDB, pitchDB):
         try:
             for cat in hittingCats:
                 hitting[cat] = []
-                for manager in teamIDsByManager:
-                    team = teamTotals[teamIDsByManager[manager]]['hit']
+                for manager in teamIDs:
+                    team = teamTotals[teamIDs[manager]]['hit']
                     hittingStat = None
                     if cat == 'AVG':
                         hittingStat = GetStats.getAVG(int(team['H']), int(team['AB']))
@@ -36,12 +36,12 @@ def buildStandings(startDate, endDate, hitDB, pitchDB):
                         hittingStat = GetStats.getOPS(obp, slg)
                     else:
                         hittingStat = int(team[cat])
-                    hitting[cat].append({ 'teamID': teamIDsByManager[manager], 'value': hittingStat, 'manager': manager, 'name': teamNamesByID[teamIDsByManager[manager]] })
+                    hitting[cat].append({ 'teamID': teamIDs[manager], 'value': hittingStat, 'manager': manager, 'name': manager })
 
             for cat in pitchingCats:
                 pitching[cat] = []
-                for manager in teamIDsByManager:
-                    team = teamTotals[teamIDsByManager[manager]]['pitch']
+                for manager in teamIDs:
+                    team = teamTotals[teamIDs[manager]]['pitch']
                     pitchingStat = None
                     if cat == 'ERA':
                         pitchingStat = GetStats.getERA(int(team['ER']), Decimal(team['IP']))
@@ -51,7 +51,7 @@ def buildStandings(startDate, endDate, hitDB, pitchDB):
                         pitchingStat = Decimal(team[cat])
                     else:
                         pitchingStat = int(team[cat])
-                    pitching[cat].append({ 'teamID': teamIDsByManager[manager], 'value': pitchingStat, 'manager': manager, 'name': teamNamesByID[teamIDsByManager[manager]] })
+                    pitching[cat].append({ 'teamID': teamIDs[manager], 'value': pitchingStat, 'manager': manager, 'name': manager })
         except:
             print("Unexpected error!!")
             e = sys.exc_info()
@@ -141,12 +141,12 @@ def buildStandings(startDate, endDate, hitDB, pitchDB):
             pitchingPoints[cat] = sortedTotals
         # teamTotals will contain hitting & pitching totals
         teamTotals = {}
-        for team in teamIDsByManager:
-            teamTotals[teamIDsByManager[team]] = {
+        for team in teamIDs:
+            teamTotals[teamIDs[team]] = {
                 'totalHit': Decimal(0),
                 'totalPitch': Decimal(0),
                 'total': Decimal(0),
-                'teamID': teamIDsByManager[team]
+                'teamID': teamIDs[team]
             }
         # HITTING
         for cat in hittingPoints:
@@ -171,7 +171,8 @@ def buildStandings(startDate, endDate, hitDB, pitchDB):
             _team['hitPlusPitch'] = hitPlusPitch
             totalPoints.append(_team)
 
-
+        # invert the team IDs dictionary so we can get managers by ID
+        teamManagersByID = {v: k for k, v in teamIDs[year].items()}
         
         print('### HITTING ###')
         hittingPoints['totals'] = sorted(totalPoints, key = lambda i: i['totalHit'], reverse=True)
@@ -203,8 +204,8 @@ def getTeamTotals(startDate, endDate, hitDb, pitchDb):
 
     try:
         totals = {}
-        for teamID in teamIDsByManager:
-            totals[teamIDsByManager[teamID]] = { "hit" : {}, "pitch": {} }
+        for teamID in teamIDs:
+            totals[teamIDs[teamID]] = { "hit" : {}, "pitch": {} }
         hitBoxScores = hitDb.find( { "$and": [ { "stats_date": { "$gte": str(startDate) } }, { "stats_date": { "$lte": str(endDate) } } ] } )
         pitchBoxScores = pitchDb.find( { "$and": [ { "stats_date": { "$gte": str(startDate) } }, { "stats_date": { "$lte": str(endDate) } } ] } )
         hStats = ['2B','3B','AB','BB','H','HBP','HR','PA','R','RBI','SB','SF']

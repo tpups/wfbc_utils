@@ -3,7 +3,7 @@ import pprint
 import datetime
 from datetime import date
 import arrow
-from inputs import utcnow, pstnow, season_start, season_end, db
+from inputs import utcnow, pstnow, db
 
 
 # todo - how to insert so can retrieve to compare with most recent pull

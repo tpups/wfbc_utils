@@ -3,33 +3,38 @@ from datetime import date
 from time import sleep
 import arrow
 import SendRequest
-from inputs import season_start, season_end, utcnow, pstnow, today
-
-end = today
-if today > season_end:
-    end = season_end
+from inputs import getStartDate, getEndDate, getBoxEndpoint, utcnow, pstnow, today
+from teams import teamIDs
 
 
-def getAllLeagueBoxScores(start = season_start, end = end):
 
-    boxScores = []
-    date = start
+def getAllLeagueBoxScores(year = "2023"):
+    start = getStartDate(year)
+    end = today
+    if today > end:
+        end = getEndDate(year)
     oneDay = datetime.timedelta(1)
-    while date <= end:
-        box = getBoxScores(date)
-        if box is not False:
-            # add as a list of two lists [hit, pitch]
-            boxScores.append(box)
-            date = date + oneDay
-            # wait half a sec
-            sleep(0.5)
-        else:
-            return False
-    return boxScores
+
+    combinedBoxScores = []
+    for team in teamIDs[year].values():
+        boxScores = []
+        date = start
+        while date <= end:
+            box = getBoxScores(year, date, team)
+            if box is not False:
+                # add as a list of two lists [hit, pitch]
+                boxScores.append(box)
+                date = date + oneDay
+                # wait half a sec
+                sleep(0.125)
+            else:
+                print("did not get box scores")
+        combinedBoxScores.append(boxScores)
+    return combinedBoxScores
 
 
 # default is get today's league box scores
-def getBoxScores(boxDate = today, teamID = "0"):
+def getBoxScores(year, boxDate = today, teamID = "0"):
 
     # make date string
     year = str(boxDate.year)
@@ -41,11 +46,8 @@ def getBoxScores(boxDate = today, teamID = "0"):
         day = "0" + day
     date = year + "-" + month + "-" + day
 
-    # API endpoints
-    # pitching = "https://www.rotowire.com/mlbcommish20/tables/box.php?leagueID=163&teamID=" + teamID + "&date=" + date + "&borp=P"
-    # hitting = "https://www.rotowire.com/mlbcommish20/tables/box.php?leagueID=163&teamID=" + teamID + "&date=" + date + "&borp=B"
-    pitching = "https://www.rotowire.com/mlbcommish20/tables/box.php?leagueID=56&teamID=" + teamID + "&date=" + date + "&borp=P"
-    hitting = "https://www.rotowire.com/mlbcommish20/tables/box.php?leagueID=56&teamID=" + teamID + "&date=" + date + "&borp=B"
+    pitching = getBoxEndpoint(year, teamID, date, "pitching")
+    hitting = getBoxEndpoint(year, teamID, date, "hitting")
 
     # get them stats
     pitchingStats = SendRequest.sendRequest(pitching, "getBoxScores - pitching")
