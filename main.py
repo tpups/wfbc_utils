@@ -10,7 +10,7 @@ from datetime import date
 from UpdateDB import updateBox, testConnection
 import GetMlbStats
 from GetBoxScoresByDate import getAllLeagueBoxScores
-from inputs import utcnow, pstnow, db, client
+from inputs import utcnow, pstnow, client
 from BuildStandings import buildStandings
 from GetRosters import getAllRosters
 
@@ -18,8 +18,11 @@ from GetRosters import getAllRosters
 # create timezone-aware(double check this) date to pass in:
 # dz = arrow.get(datetime(2020, 9, 24), 'US/Pacific').date()
 
+# file = open('2023.json')
+# box = json.load(file)
+
 # CREATE BOX SCORE JSON
-# box = getAllLeagueBoxScores("2023")
+box = getAllLeagueBoxScores("2023")
 # json_box = json.dumps(box)
 # with open("2023.json", "w") as outfile:
 #     outfile.write(json_box)
@@ -31,18 +34,16 @@ from GetRosters import getAllRosters
 # new_f = f[keep_col]
 # new_f.to_csv("rosters.csv", index=False)
 
-# TEST DB CONNECTION
-# testConnection()
-
-# if box is not False:
-#     # pass in true updates league box, false for team box
-#     updateResult = updateBox(box, True)
-#     if updateResult['newEntry'] is True:
-#         print('New box scores were added')
-#     if updateResult['updateExisting'] is True:
-#         print('Existing box scores were updated')
-#     elif updateResult['newEntry'] is False and updateResult['updateExisting'] is False:
-#         print('No box scores to update')
+if box is not False:
+    # pass in true updates league box, false for team box
+    for team in box:
+        updateResult = updateBox("2023", team, False)
+    if updateResult['newEntry'] is True:
+        print('New box scores were added')
+    if updateResult['updateExisting'] is True:
+        print('Existing box scores were updated')
+    elif updateResult['newEntry'] is False and updateResult['updateExisting'] is False:
+        print('No box scores to update')
 
 # # league stats
 # hittingBox = db.league_box_hitting
@@ -53,3 +54,6 @@ from GetRosters import getAllRosters
 # firstPitch = GetMlbStats.getFirstPitch()
 # if firstPitch is False:
 #     print('No games on this day')
+
+# TEST DB CONNECTION
+# testConnection()

@@ -3,13 +3,12 @@ import pprint
 import datetime
 from datetime import date
 import arrow
-from inputs import utcnow, pstnow, client, db
-
+from inputs import utcnow, pstnow, client, mongoConnect
 
 # todo - how to insert so can retrieve to compare with most recent pull
 
-def updateBox(stats, isLeagueStats = True):
-
+def updateBox(year, stats, isLeagueStats = True):
+    db = mongoConnect(year)
     if stats is not None:
         updateExisting = False
         newEntry = False
@@ -30,13 +29,13 @@ def updateBox(stats, isLeagueStats = True):
             pitchToUpdate = []
 
             for doc in hit:
-                checkResult = checkPrevious(doc, "hit", isLeagueStats)
+                checkResult = checkPrevious(doc, db, "hit", isLeagueStats)
                 if checkResult['newEntry'] is True:
                     hitToUpdate.append(doc)
                 if checkResult['updateExisting'] is True:
                     updateExisting = True
             for doc in pitch:
-                checkResult = checkPrevious(doc, "pitch", isLeagueStats)
+                checkResult = checkPrevious(doc, db, "pitch", isLeagueStats)
                 if checkResult['newEntry'] is True:
                     pitchToUpdate.append(doc)
                 if checkResult['updateExisting'] is True:
@@ -56,7 +55,7 @@ def updateBox(stats, isLeagueStats = True):
                 'updateExisting': updateExisting}
 
 
-def checkPrevious(document, side = "", league = True):
+def checkPrevious(document, db, side = "", league = True):
 
     if side != "":
         status = { "hit": {}, "pitch": {} }
@@ -78,11 +77,11 @@ def checkPrevious(document, side = "", league = True):
 
         teamID = document['teamID']
         stats_date = document['stats_date']
-        previous_documents = collection.find({"teamID": teamID, "stats_date": stats_date})
         previous_document = None
-        previous_count = previous_documents.count()
+        previous_count = collection.count_documents({"teamID": teamID, "stats_date": stats_date})
 
         if previous_count != 0:
+            previous_documents = collection.find({"teamID": teamID, "stats_date": stats_date})
             newEntry = False
             # print("found " + str(previous_count) + " previous (" + side + ") data for this date")
             previous_document = previous_documents[previous_count - 1]

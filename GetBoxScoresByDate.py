@@ -10,9 +10,10 @@ from teams import teamIDs
 
 def getAllLeagueBoxScores(year = "2023"):
     start = getStartDate(year)
-    end = today
-    if today > end:
-        end = getEndDate(year)
+    end = getEndDate(year)
+    if today < end:
+        print("getting box scores through today")
+        end = today
     oneDay = datetime.timedelta(1)
 
     combinedBoxScores = []
@@ -46,6 +47,8 @@ def getBoxScores(year, boxDate = today, teamID = "0"):
         day = "0" + day
     date = year + "-" + month + "-" + day
 
+    print(date + " team ID: " + teamID)
+
     pitching = getBoxEndpoint(year, teamID, date, "pitching")
     hitting = getBoxEndpoint(year, teamID, date, "hitting")
 
@@ -60,6 +63,7 @@ def getBoxScores(year, boxDate = today, teamID = "0"):
     # add to lists
     if hittingStats is not None:
         for item in hittingStats:
+            item['teamID'] = teamID
             item['stats_date'] = str(boxDate)
             item['download_date'] = str(pstnow)
             new_hittingStats.append(item)
@@ -67,6 +71,7 @@ def getBoxScores(year, boxDate = today, teamID = "0"):
         return False
     if pitchingStats is not None:
         for item in pitchingStats:
+            item['teamID'] = teamID
             item['stats_date'] = str(boxDate)
             item['download_date'] = str(pstnow)
             new_pitchingStats.append(item)

@@ -19,7 +19,9 @@ numTeams = 12
 # mongo stuff
 uri = f"mongodb+srv://admin:{mongopw}@cluster0.nfj4j.mongodb.net/?retryWrites=true&w=majority"
 client = MongoClient(uri, server_api=ServerApi('1'))
-db = client.wfbc
+def mongoConnect(year = "2023"):
+    db = client["wfbc" + year]
+    return db
 
 # MLB regular season season start and end dates, league IDs
 seasons = {

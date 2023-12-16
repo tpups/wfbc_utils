@@ -5,7 +5,7 @@ import pprint
 import sys
 import GetStats
 from teams import teamIDs
-from inputs import numTeams, db
+from inputs import numTeams
 
 # TODO
 # 1) Build standings as they were on this date
