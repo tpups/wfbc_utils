@@ -1,5 +1,6 @@
 ## Secrets
-
+create .env file and add:
+`mongopw = "password"`
 
 ## User cookie:
 create Cookie.py and include variable cookie = "cookie"
