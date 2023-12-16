@@ -1,6 +1,12 @@
-from pymongo import MongoClient
+from dotenv import load_dotenv
+import os
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
 from datetime import date
 import arrow
+
+load_dotenv()
+mongopw = os.getenv("mongopw")
 
 # DATES AND TIMES
 utcnow = arrow.utcnow()
@@ -11,8 +17,9 @@ today = pstnow.date()
 numTeams = 12
 
 # mongo stuff
-client = MongoClient()
-db = client.wfbc2022
+uri = f"mongodb+srv://admin:{mongopw}@cluster0.nfj4j.mongodb.net/?retryWrites=true&w=majority"
+client = MongoClient(uri, server_api=ServerApi('1'))
+db = client.wfbc
 
 # MLB regular season season start and end dates, league IDs
 seasons = {

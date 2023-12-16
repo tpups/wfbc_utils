@@ -3,7 +3,7 @@ import pprint
 import datetime
 from datetime import date
 import arrow
-from inputs import utcnow, pstnow, db
+from inputs import utcnow, pstnow, client, db
 
 
 # todo - how to insert so can retrieve to compare with most recent pull
@@ -121,6 +121,12 @@ def updateDocument(db, _id, cat, old_value = None, new_value = None):
 #     standings = buildStandings(startDate, endDate, hittingBox, pitchingBox)
 #     return True
 
+def testConnection():
+    try:
+        client.admin.command('ping')
+        print("Pinged your deployment. You successfully connected to MongoDB!")
+    except Exception as e:
+        print(e)
 
 def wipeCollection(collection, areYouSure=False):
     if collection is not None and areYouSure is True:

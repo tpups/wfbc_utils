@@ -1,3 +1,4 @@
+
 import arrow
 from pymongo import MongoClient
 import datetime
@@ -6,36 +7,32 @@ import csv
 import pandas as pd
 from io import StringIO
 from datetime import date
-from UpdateDB import updateBox, db
+from UpdateDB import updateBox, testConnection
 import GetMlbStats
 from GetBoxScoresByDate import getAllLeagueBoxScores
-from inputs import utcnow, pstnow, db
+from inputs import utcnow, pstnow, db, client
 from BuildStandings import buildStandings
 from GetRosters import getAllRosters
+
 
 # create timezone-aware(double check this) date to pass in:
 # dz = arrow.get(datetime(2020, 9, 24), 'US/Pacific').date()
 
+# CREATE BOX SCORE JSON
 # box = getAllLeagueBoxScores("2023")
 # json_box = json.dumps(box)
 # with open("2023.json", "w") as outfile:
 #     outfile.write(json_box)
 
-rosters = json.dumps(getAllRosters("2024"))
-f = pd.read_json(StringIO(rosters))
-keep_col = ['manager', 'player', 'team']
-new_f = f[keep_col]
-new_f.to_csv("rosters.csv", index=False)
+# CREATE ROSTERS CSV
+# rosters = json.dumps(getAllRosters("2024"))
+# f = pd.read_json(StringIO(rosters))
+# keep_col = ['manager', 'player', 'team']
+# new_f = f[keep_col]
+# new_f.to_csv("rosters.csv", index=False)
 
-
-# rosters_keys = rosters[0].keys()
-# with open("rosters.csv", "w", encoding='utf8', newline='') as outfile:
-#     fieldnames = ['manager', 'player', 'team']
-#     writer = csv.DictWriter(outfile, rosters_keys)
-#     writer.writeheader()
-#     for player in rosters:
-#         writer.writerow(player)
-
+# TEST DB CONNECTION
+# testConnection()
 
 # if box is not False:
 #     # pass in true updates league box, false for team box
