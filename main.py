@@ -31,7 +31,9 @@ def UpdateDB(box, year):
 
 # file = open('2023.json')
 # box = json.load(file)
-                
+
+# box = getAllLeagueBoxScores("2019")
+# UpdateDB(box, "2019")                
 # box = getAllLeagueBoxScores("2020")
 # UpdateDB(box, "2020")
 # box = getAllLeagueBoxScores("2021")
@@ -54,11 +56,11 @@ def UpdateDB(box, year):
 # new_f.to_csv("rosters.csv", index=False)
 
 # league stats
-db = mongoConnect("2021")
+db = mongoConnect("2019")
 hittingBox = db.team_box_hitting
 pitchingBox = db.team_box_pitching
 
-buildStandings("2021", seasons["2021"]["start"], seasons["2021"]["end"], hittingBox, pitchingBox)
+buildStandings("2019", seasons["2019"]["start"], seasons["2019"]["end"], hittingBox, pitchingBox)
 
 # firstPitch = GetMlbStats.getFirstPitch()
 # if firstPitch is False:

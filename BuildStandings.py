@@ -1,4 +1,5 @@
 import traceback
+import math
 from decimal import Decimal
 from pymongo import MongoClient
 from datetime import date
@@ -15,12 +16,12 @@ def buildStandings(year, startDate, endDate, hitDB, pitchDB):
 
     points = list(reversed(range(1, numTeams + 1)))
     teams = getTeams(year)
-    teamTotals = getTeamTotals(teams, startDate, endDate, hitDB, pitchDB)
+    teamTotals = getTeamTotals(year, teams, startDate, endDate, hitDB, pitchDB)
 
 
     if teamTotals is not False:
         hittingCats = ['AVG','OPS','R','SB','HR','RBI']
-        pitchingCats = ['ERA','WHIP','IP','K','SV','QS']
+        pitchingCats = ['ERA','WHIP','IP','K','S' if year == '2019' else 'SV','QS']
         hitting = {}
         pitching = {}
         try:
@@ -202,7 +203,7 @@ def buildStandings(year, startDate, endDate, hitDB, pitchDB):
         return True
 
 
-def getTeamTotals(teams, startDate, endDate, hitDb, pitchDb):
+def getTeamTotals(year, teams, startDate, endDate, hitDb, pitchDb):
     try:
         totals = {}
         for team in teams:
@@ -212,7 +213,7 @@ def getTeamTotals(teams, startDate, endDate, hitDb, pitchDb):
         # hitBoxScores = hitDb.find( { "$and": [ { "stats_date": { "$gte": str(startDate) } }, { "stats_date": { "$lte": str(endDate) } } ] } )
         # pitchBoxScores = pitchDb.find( { "$and": [ { "stats_date": { "$gte": str(startDate) } }, { "stats_date": { "$lte": str(endDate) } } ] } )
         hStats = ['2B','3B','AB','BB','H','HBP','HR','PA','R','RBI','SB','SF']
-        pStats = ['BB','ER','H','HB','IP','K','QS','SV']
+        pStats = ['BB','ER','H','HB','IP','K','QS','S' if year == '2019' else 'SV']
 
         for score in hitBoxScores:
             team = totals[score["teamID"]]["hit"]
@@ -234,6 +235,14 @@ def getTeamTotals(teams, startDate, endDate, hitDb, pitchDb):
                     # divide by 3 is innings
                     if stat == "IP":
                         innings = Decimal(score[stat])
+                        if year == "2019":
+                            partialInnings = innings % 1 * Decimal(3.3)
+                            _innings = math.floor(innings)
+                            innings = _innings + partialInnings
+                            # if Decimal.compare(partialInnings, Decimal(0.1)) == 0:
+                            #     innings = Decimal(_innings + 0.33)
+                            # elif Decimal.compare(partialInnings, Decimal(0.2)) == 0:
+                            #     innings = Decimal(_innings + 0.67)
                         if stat not in team:
                             team[stat] = score[stat]
                         else:
