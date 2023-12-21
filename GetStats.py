@@ -41,6 +41,9 @@ def getTotalBases(H, _2B, _3B, HR):
     # print("Total Bases: " + str(totalBases))
     return totalBases
 
+def getAtBats():
+    return
+
 # Pitching
 #############
 

@@ -3,10 +3,9 @@ from datetime import date
 from time import sleep
 import arrow
 import SendRequest
-from inputs import getStartDate, getEndDate, getBoxEndpoint, utcnow, pstnow, today
-from teams import teamIDs
+from inputs import getStartDate, getEndDate, getBoxEndpoint, utcnow, pstnow, today, getTeams
 
-
+# Box score endpoints started including players with no stats in 2020
 
 def getAllLeagueBoxScores(year = "2023"):
     start = getStartDate(year)
@@ -17,11 +16,13 @@ def getAllLeagueBoxScores(year = "2023"):
     oneDay = datetime.timedelta(1)
 
     combinedBoxScores = []
-    for team in teamIDs[year].values():
+    teams = getTeams(year)
+    for team in teams:
         boxScores = []
         date = start
+        teamID = team['team_id']
         while date <= end:
-            box = getBoxScores(year, date, team)
+            box = getBoxScores(year, date, teamID)
             if box is not False:
                 # add as a list of two lists [hit, pitch]
                 boxScores.append(box)

@@ -23,8 +23,53 @@ def mongoConnect(year = "2023"):
     db = client["wfbc" + year]
     return db
 
+# teams
+def getTeams(year):
+    db = mongoConnect(year)
+    _teams = db.teams.find()
+    teams = []
+    for team in _teams:
+        teams.append({
+            'manager' : team['manager'],
+            'team_id' : team['team_id'],
+            'team_name' : team['team_name']
+        })
+    return teams
+
 # MLB regular season season start and end dates, league IDs
 seasons = {
+    "2011" : 
+    {
+        "leagueID" : "812"
+    },
+    "2012" : 
+    {
+        "leagueID" : "438"
+    },
+    "2013" : 
+    {
+        "leagueID" : "393"
+    },
+    "2014" : 
+    {
+        "leagueID" : "549"
+    },
+    "2015" : 
+    {
+        "leagueID" : "288"
+    },
+    "2016" : 
+    {
+        "leagueID" : "82"
+    },
+    "2017" : 
+    {
+        "leagueID" : "153"
+    },
+    "2018" : 
+    {
+        "leagueID" : "151"
+    },
     "2019" : 
     {
         "start" : date(2019, 3, 20),
@@ -84,5 +129,8 @@ def getRosterEndpoint(year, teamID):
 
 def getBoxEndpoint(year, teamID, date, hittingOrPitching):
     shortYear = year[2:]
-    boxEndpoint = endpoint + shortYear + "/tables/box.php?leagueID=" + seasons[year]["leagueID"] + "&teamID=" + teamID + "&borp=" + ("B" if hittingOrPitching == "hitting" else "P")
+    if teamID == "first":
+        teams = getTeams(year)
+        teamID = teams[0]['team_id']
+    boxEndpoint = endpoint + shortYear + "/tables/box.php?leagueID=" + seasons[year]["leagueID"] + "&teamID=" + teamID + "&date=" + date + "&borp=" + ("B" if hittingOrPitching == "hitting" else "P")
     return boxEndpoint

@@ -5,6 +5,28 @@ from datetime import date
 import arrow
 from inputs import utcnow, pstnow, client, mongoConnect
 
+def updateTeams(year, teamNames):
+    db = mongoConnect(year)
+    teams = db.teams
+    response = ""
+    if teamNames is not None:
+        for manager, teamDetails in teamNames.items():
+            team = {
+                'manager': manager,
+                'team_id': teamDetails['ID'],
+                'team_name': teamDetails['TeamName']
+            }
+            team_existing = teams.find_one({'team_id': team['team_id']})
+            if team_existing is not None and team['team_id'] is not None:
+                result = teams.update_one( {'_id': team_existing['_id']}, {'$set': {'manager':team['manager'], 'team_name':team['team_name']}}, upsert=True )
+                response = "updated existing team"
+            else:
+                result = teams.insert_one(team)
+                response = "created new team"
+            print(response)
+    return
+
+
 # todo - how to insert so can retrieve to compare with most recent pull
 
 def updateBox(year, stats, isLeagueStats = True):

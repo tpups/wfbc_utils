@@ -7,10 +7,10 @@ import csv
 import pandas as pd
 from io import StringIO
 from datetime import date
-from UpdateDB import updateBox, testConnection
+from UpdateDB import updateBox, testConnection, updateTeams
 import GetMlbStats
 from GetBoxScoresByDate import getAllLeagueBoxScores
-from inputs import utcnow, pstnow, client
+from inputs import utcnow, pstnow, client, seasons, getBoxEndpoint, getTeams, mongoConnect
 from BuildStandings import buildStandings
 from GetRosters import getAllRosters
 
@@ -32,12 +32,14 @@ def UpdateDB(box, year):
 # file = open('2023.json')
 # box = json.load(file)
                 
-box = getAllLeagueBoxScores("2021")
-UpdateDB(box, "2021")
 # box = getAllLeagueBoxScores("2020")
 # UpdateDB(box, "2020")
-# box = getAllLeagueBoxScores("2019")
-# UpdateDB(box, "2019")
+# box = getAllLeagueBoxScores("2021")
+# UpdateDB(box, "2021")
+# box = getAllLeagueBoxScores("2022")
+# UpdateDB(box, "2022")
+# box = getAllLeagueBoxScores("2023")
+# UpdateDB(box, "2023")
 
 # CREATE BOX SCORE JSON
 # json_box = json.dumps(box)
@@ -51,11 +53,12 @@ UpdateDB(box, "2021")
 # new_f = f[keep_col]
 # new_f.to_csv("rosters.csv", index=False)
 
-# # league stats
-# hittingBox = db.league_box_hitting
-# pitchingBox = db.league_box_pitching
+# league stats
+db = mongoConnect("2021")
+hittingBox = db.team_box_hitting
+pitchingBox = db.team_box_pitching
 
-# buildStandings(season_start, season_end, hittingBox, pitchingBox)
+buildStandings("2021", seasons["2021"]["start"], seasons["2021"]["end"], hittingBox, pitchingBox)
 
 # firstPitch = GetMlbStats.getFirstPitch()
 # if firstPitch is False:
@@ -63,3 +66,46 @@ UpdateDB(box, "2021")
 
 # TEST DB CONNECTION
 # testConnection()
+                
+# endpoint = getBoxEndpoint("2022", "first", "2020-08-15", "hitting")
+# print(endpoint)
+
+# teams = {
+#         "Jake" : {
+#             "ID" : "7662",
+#             "TeamName" : "Bingo! Dino DNA!"
+#         },
+#         "Joe" : {
+#             "ID" : "7671",
+#             "TeamName" : "Randy Jackson's Autograph"
+#         },
+#         "Josh" : {
+#             "ID" : "7669",
+#             "TeamName" : "Puff Puff Pitch"
+#         },
+#         "Justin" : {
+#             "ID" : "7666",
+#             "TeamName" : "Legend, wait for it...ary"
+#         },
+#         "Rocky" : {
+#             "ID" : "7664",
+#             "TeamName" : "Epic baseball super team"
+#         },
+#         "Tyler" : {
+#             "ID" : "7667",
+#             "TeamName" : "Chudley Cannons"
+#         },
+#         "Team 1" : {
+#             "ID" : "7665",
+#             "TeamName" : "Team 1"
+#         },
+#         "Team 2" : {
+#             "ID" : "7670",
+#             "TeamName" : "Team 2"
+#         },
+#         "Team 3" : {
+#             "ID" : "7668",
+#             "TeamName" : "Team 3"
+#         }
+# }
+# response = updateTeams("2011", teams)
