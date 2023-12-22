@@ -5,6 +5,9 @@ create .env file and add:
 ## User cookie:
 create Cookie.py and include variable cookie = "cookie"
 
+## Rotowire:
+Box score stats must be customized to include all stats needed by UpdateDB. This way they will also be available in the API.
+
 ## Packages:
 `pip install pymongo`  
 `pip install MLB-StatsAPI`  
