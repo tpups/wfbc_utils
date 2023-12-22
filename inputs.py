@@ -90,8 +90,10 @@ seasons = {
     },
     "2022" : 
     {
-        "start" : date(2022, 4, 7),
-        "end" : date(2022, 10, 5),
+        "start" : date(2022, 5, 7),
+        "end" : date(2022, 5, 15),
+        # "start" : date(2022, 4, 7),
+        # "end" : date(2022, 10, 5),
         "leagueID" : "4"
     },
     "2023" : 

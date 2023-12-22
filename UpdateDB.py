@@ -99,11 +99,13 @@ def checkPrevious(document, db, side = "", league = True):
 
         teamID = document['teamID']
         stats_date = document['stats_date']
+        player = document['player']
+        position = document['position']
         previous_document = None
-        previous_count = collection.count_documents({"teamID": teamID, "stats_date": stats_date})
+        previous_count = collection.count_documents({"teamID": teamID, "stats_date": stats_date, "player": player, "position": position})
 
         if previous_count != 0:
-            previous_documents = collection.find({"teamID": teamID, "stats_date": stats_date})
+            previous_documents = collection.find({"teamID": teamID, "stats_date": stats_date, "player": player, "position": position})
             newEntry = False
             # print("found " + str(previous_count) + " previous (" + side + ") data for this date")
             previous_document = previous_documents[previous_count - 1]
@@ -113,10 +115,12 @@ def checkPrevious(document, db, side = "", league = True):
                     if document[cat] != previous_document[cat]:
                         status["hit"][cat] = "values do not match"
                         updateExisting = True
-                        update_result = updateDocument(collection, previous_document['_id'], cat, previous_document[cat], document[cat])
-                elif cat in document or cat in previous_document:
+                        update_result = updateDocument(collection, previous_document['_id'], cat, previous_document
+                        [cat], document[cat])
+                elif cat in document:
                     status["hit"][cat] = "only one document contains key"
                     updateExisting = True
+                    update_result = updateDocument(collection, previous_document['_id'], cat, None, document[cat])
 
         return {'newEntry': newEntry,
                 'updateExisting': updateExisting}
@@ -126,13 +130,17 @@ def checkPrevious(document, db, side = "", league = True):
 
 def updateDocument(db, _id, cat, old_value = None, new_value = None):
 
+    print(str(_id))
     # let's make updates a list of strings
     updates = []
     doc = db.find_one({"_id": _id})
     if 'updates' in doc:
         updates = doc['updates']
     # add something about the update
-    updates.append(str(pstnow) + " ::: changed " + str(cat) + " from " + str(old_value) + " to " + str(new_value))
+    if (old_value is None):
+        updates.append(str(pstnow) + " ::: added " + str(cat) + " with value " + str(new_value))
+    else:    
+        updates.append(str(pstnow) + " ::: changed " + str(cat) + " from " + str(old_value) + " to " + str(new_value))
     # make the update
     result = db.update_one( {"_id": _id}, {"$set": {cat:new_value, "updates": updates}}, upsert=True )
     # return the number of documents updated

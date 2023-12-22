@@ -38,8 +38,8 @@ def UpdateDB(box, year):
 # UpdateDB(box, "2020")
 # box = getAllLeagueBoxScores("2021")
 # UpdateDB(box, "2021")
-# box = getAllLeagueBoxScores("2022")
-# UpdateDB(box, "2022")
+box = getAllLeagueBoxScores("2022")
+UpdateDB(box, "2022")
 # box = getAllLeagueBoxScores("2023")
 # UpdateDB(box, "2023")
 
@@ -56,11 +56,11 @@ def UpdateDB(box, year):
 # new_f.to_csv("rosters.csv", index=False)
 
 # league stats
-db = mongoConnect("2019")
-hittingBox = db.team_box_hitting
-pitchingBox = db.team_box_pitching
+# db = mongoConnect("2022")
+# hittingBox = db.team_box_hitting
+# pitchingBox = db.team_box_pitching
 
-buildStandings("2019", seasons["2019"]["start"], seasons["2019"]["end"], hittingBox, pitchingBox)
+# buildStandings("2022", seasons["2022"]["start"], seasons["2022"]["end"], hittingBox, pitchingBox)
 
 # firstPitch = GetMlbStats.getFirstPitch()
 # if firstPitch is False:
@@ -69,7 +69,7 @@ buildStandings("2019", seasons["2019"]["start"], seasons["2019"]["end"], hitting
 # TEST DB CONNECTION
 # testConnection()
                 
-# endpoint = getBoxEndpoint("2022", "first", "2020-08-15", "hitting")
+# endpoint = getBoxEndpoint("2022", "first", "2022-08-15", "hitting")
 # print(endpoint)
 
 # teams = {
