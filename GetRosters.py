@@ -3,8 +3,6 @@ import SendRequest
 
 def getAllRosters(year = "2024"):
     teams = getTeams(year)
-    # invert the team IDs dictionary so we can get managers by ID
-    teamManagersByID = {v: k for k, v in teamIDs[year].items()}
     rosters = []
     for team in teams:
         teamID = team['team_id']
@@ -15,7 +13,7 @@ def getAllRosters(year = "2024"):
         if roster is not None:
             for item in roster:
                 item['date'] = str(pstnow)
-                item['manager'] = str(teamManagersByID[team])
+                item['manager'] = str(team['manager'])
                 rosters.append(item)
         else:
             return False

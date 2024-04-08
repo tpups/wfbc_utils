@@ -21,7 +21,7 @@ def buildStandings(year, startDate, endDate, hitDB, pitchDB):
 
     if teamTotals is not False:
         hittingCats = ['AVG','OPS','R','SB','HR','RBI']
-        pitchingCats = ['ERA','WHIP','IP','K','S' if year == '2019' else 'SV','QS']
+        pitchingCats = ['ERA','WHIP','IP','K','S' if year == '2019' else 'SV','QA']
         hitting = {}
         pitching = {}
         try:
@@ -172,7 +172,6 @@ def buildStandings(year, startDate, endDate, hitDB, pitchDB):
             _team['hitPlusPitch'] = hitPlusPitch
             totalPoints.append(_team)
 
-        # invert the team IDs dictionary so we can get managers by ID
         teamManagersByID = {}
         for team in teams:
             teamManagersByID[team['team_id']] = team['manager']
@@ -200,7 +199,11 @@ def buildStandings(year, startDate, endDate, hitDB, pitchDB):
                 for team in pitchingPoints[cat]:
                     print("ID: " + str(team['teamID']) + " ::: " + teamManagersByID[str(team['teamID'])] + " ::: " + str(team['value']) + " ::: " + str(team['points']) + " Points")
 
-        return True
+        return {
+            'hitting': hitting,
+            'pitching': pitching,
+            'standings': standings
+        }
 
 
 def getTeamTotals(year, teams, startDate, endDate, hitDb, pitchDb):
@@ -213,7 +216,7 @@ def getTeamTotals(year, teams, startDate, endDate, hitDb, pitchDb):
         # hitBoxScores = hitDb.find( { "$and": [ { "stats_date": { "$gte": str(startDate) } }, { "stats_date": { "$lte": str(endDate) } } ] } )
         # pitchBoxScores = pitchDb.find( { "$and": [ { "stats_date": { "$gte": str(startDate) } }, { "stats_date": { "$lte": str(endDate) } } ] } )
         hStats = ['2B','3B','AB','BB','H','HBP','HR','PA','R','RBI','SB','SF']
-        pStats = ['BB','ER','H','HB','IP','K','QS','S' if year == '2019' else 'SV']
+        pStats = ['BB','ER','H','HB','IP','K','QS','QA','S' if year == '2019' else 'SV']
 
         for score in hitBoxScores:
             team = totals[score["teamID"]]["hit"]
@@ -264,4 +267,26 @@ def getTeamTotals(year, teams, startDate, endDate, hitDb, pitchDb):
         traceback.print_exc()
         return False
 
+    totals = getQualityAppearances(pitchDb, startDate, endDate, totals)
+
+    return totals
+
+def getQualityAppearances(pitchDb, startDate, endDate, totals):
+    pitchBoxScores = pitchDb.find( { "position": "P", "$and": [ { "stats_date": { "$gte": str(startDate) } }, { "stats_date": { "$lte": str(endDate) } } ] } )
+    for score in pitchBoxScores:
+        if score["player"] != "TOT":
+            team = totals[score["teamID"]]["pitch"]
+            qa = False
+            if "IP" in score:
+                ip = Decimal(score["IP"])
+                if ip >= 5:
+                    er = int(score["ER"])
+                    era = GetStats.getERA(er, ip)
+                    if era <= 4.5:
+                        if "QA" not in team:
+                            team["QA"] = 1
+                        else:
+                            currentTotal = team["QA"]
+                            newTotal = int(currentTotal) + 1
+                            team["QA"] = str(newTotal)
     return totals

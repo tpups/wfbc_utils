@@ -38,8 +38,8 @@ def UpdateDB(box, year):
 # UpdateDB(box, "2020")
 # box = getAllLeagueBoxScores("2021")
 # UpdateDB(box, "2021")
-box = getAllLeagueBoxScores("2022")
-UpdateDB(box, "2022")
+# box = getAllLeagueBoxScores("2022")
+# UpdateDB(box, "2022")
 # box = getAllLeagueBoxScores("2023")
 # UpdateDB(box, "2023")
 
@@ -56,11 +56,11 @@ UpdateDB(box, "2022")
 # new_f.to_csv("rosters.csv", index=False)
 
 # league stats
-# db = mongoConnect("2022")
-# hittingBox = db.team_box_hitting
-# pitchingBox = db.team_box_pitching
+db = mongoConnect("2023")
+hittingBox = db.team_box_hitting
+pitchingBox = db.team_box_pitching
 
-# buildStandings("2022", seasons["2022"]["start"], seasons["2022"]["end"], hittingBox, pitchingBox)
+buildStandings("2023", seasons["2023"]["start"], seasons["2023"]["end"], hittingBox, pitchingBox)
 
 # firstPitch = GetMlbStats.getFirstPitch()
 # if firstPitch is False:
@@ -74,40 +74,52 @@ UpdateDB(box, "2022")
 
 # teams = {
 #         "Jake" : {
-#             "ID" : "7662",
-#             "TeamName" : "Bingo! Dino DNA!"
+#             "ID" : "600",
+#             "TeamName" : "MA⋯CHE⋯TE"
 #         },
 #         "Joe" : {
-#             "ID" : "7671",
-#             "TeamName" : "Randy Jackson's Autograph"
+#             "ID" : "595",
+#             "TeamName" : "Any Given Everyday"
 #         },
 #         "Josh" : {
-#             "ID" : "7669",
-#             "TeamName" : "Puff Puff Pitch"
+#             "ID" : "601",
+#             "TeamName" : "Pony Express"
 #         },
 #         "Justin" : {
-#             "ID" : "7666",
-#             "TeamName" : "Legend, wait for it...ary"
+#             "ID" : "603",
+#             "TeamName" : "Rye Bread and Mustard"
 #         },
 #         "Rocky" : {
-#             "ID" : "7664",
-#             "TeamName" : "Epic baseball super team"
+#             "ID" : "602",
+#             "TeamName" : "Pube Cruisers"
 #         },
 #         "Tyler" : {
-#             "ID" : "7667",
+#             "ID" : "598",
 #             "TeamName" : "Chudley Cannons"
 #         },
-#         "Team 1" : {
-#             "ID" : "7665",
-#             "TeamName" : "Team 1"
+#         "Clint" : {
+#             "ID" : "597",
+#             "TeamName" : "BilderBillies Group"
 #         },
-#         "Team 2" : {
-#             "ID" : "7670",
-#             "TeamName" : "Team 2"
+#         "David" : {
+#             "ID" : "594",
+#             "TeamName" : "Big Ball Chunky Time"
 #         },
-#         "Team 3" : {
-#             "ID" : "7668",
-#             "TeamName" : "Team 3"
+#         "Mark" : {
+#             "ID" : "596",
+#             "TeamName" : "Babb Ruth"
+#         },
+#         "Andy" : {
+#             "ID" : "604",
+#             "TeamName" : "Series-bound in Seattle"
+#         },
+#         "Patrick" : {
+#             "ID" : "605",
+#             "TeamName" : "White Hardness"
+#         },
+#         "Kent" : {
+#             "ID" : "599",
+#             "TeamName" : "Kent's Dents"
 #         }
 # }
-# response = updateTeams("2011", teams)
+# response = updateTeams("2024", teams)

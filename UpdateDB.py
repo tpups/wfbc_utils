@@ -3,7 +3,8 @@ import pprint
 import datetime
 from datetime import date
 import arrow
-from inputs import utcnow, pstnow, client, mongoConnect
+from inputs import utcnow, pstnow, client, mongoConnect, today, getStartDate, getEndDate
+from BuildStandings import buildStandings
 
 def updateTeams(year, teamNames):
     db = mongoConnect(year)
@@ -25,6 +26,23 @@ def updateTeams(year, teamNames):
                 response = "created new team"
             print(response)
     return
+
+# def updateStandings(year):
+#     db = mongoConnect(year)
+#     teams = db.teams
+#     standings = db.standings
+#     hittingBox = db.team_box_hitting
+#     pitchingBox = db.team_box_pitching
+#     start = getStartDate(year)
+#     end = getEndDate(year)
+#     if today < end:
+#         end = today
+#     oneDay = datetime.timedelta(1)
+#     date = start
+#     while date <= end:
+#         result = buildStandings(year, start, end, hittingBox, pitchingBox)
+#         if result is not False:
+#             update = 
 
 
 # todo - how to insert so can retrieve to compare with most recent pull
@@ -130,7 +148,6 @@ def checkPrevious(document, db, side = "", league = True):
 
 def updateDocument(db, _id, cat, old_value = None, new_value = None):
 
-    print(str(_id))
     # let's make updates a list of strings
     updates = []
     doc = db.find_one({"_id": _id})
